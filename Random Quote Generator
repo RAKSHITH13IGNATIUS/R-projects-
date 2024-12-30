@@ -1,0 +1,39 @@
+library(shiny)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Random Quote Generator"),
+  sidebarLayout(
+    sidebarPanel(
+      actionButton("generate", "Generate Quote")
+    ),
+    mainPanel(
+      h3("Your Quote:"),
+      textOutput("quote", container = span)
+    )
+  )
+)
+
+# Define Server
+server <- function(input, output, session) {
+  quotes <- c(
+    "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
+    "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+    "Believe you can and you're halfway there. - Theodore Roosevelt",
+    "Act as if what you do makes a difference. It does. - William James",
+    "Happiness is not something ready-made. It comes from your own actions. - Dalai Lama"
+  )
+  
+  random_quote <- reactiveVal("")
+  
+  observeEvent(input$generate, {
+    random_quote(sample(quotes, 1))
+  })
+  
+  output$quote <- renderText({
+    random_quote()
+  })
+}
+
+# Run the App
+shinyApp(ui = ui, server = server)
