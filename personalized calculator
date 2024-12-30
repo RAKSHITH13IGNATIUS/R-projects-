@@ -1,0 +1,46 @@
+library(shiny)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Personalized Calculator"),
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("num1", "Enter First Number:", value = 0),
+      numericInput("num2", "Enter Second Number:", value = 0),
+      selectInput("operation", "Choose Operation:", 
+                  choices = c("Addition", "Subtraction", "Multiplication", "Division")),
+      actionButton("calculate", "Calculate")
+    ),
+    mainPanel(
+      h3("Calculation Result:"),
+      textOutput("result")
+    )
+  )
+)
+
+# Define Server
+server <- function(input, output, session) {
+  result <- reactiveVal(NA)
+  
+  observeEvent(input$calculate, {
+    num1 <- input$num1
+    num2 <- input$num2
+    operation <- input$operation
+    
+    result(
+      switch(operation,
+             "Addition" = num1 + num2,
+             "Subtraction" = num1 - num2,
+             "Multiplication" = num1 * num2,
+             "Division" = ifelse(num2 != 0, num1 / num2, "Error: Division by Zero")
+      )
+    )
+  })
+  
+  output$result <- renderText({
+    if (!is.na(result())) result() else "Awaiting input..."
+  })
+}
+
+# Run the App
+shinyApp(ui = ui, server = server)
