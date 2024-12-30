@@ -1,0 +1,30 @@
+library(shiny)
+
+# UI
+ui <- fluidPage(
+  titlePanel("Maze Game"),
+  fluidRow(
+    column(8, plotOutput("maze", height = "400px", width = "400px")),
+    column(4, actionButton("up", "↑"), br(), actionButton("left", "←"),
+           actionButton("right", "→"), br(), actionButton("down", "↓"))
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  maze <- matrix(0, 10, 10)
+  maze[c(1, 10), c(1, 10)] <- 1  # Start and end
+  pos <- reactiveValues(x = 1, y = 1)
+  
+  observeEvent(input$up, { if (pos$y > 1) pos$y <- pos$y - 1 })
+  observeEvent(input$down, { if (pos$y < 10) pos$y <- pos$y + 1 })
+  observeEvent(input$left, { if (pos$x > 1) pos$x <- pos$x - 1 })
+  observeEvent(input$right, { if (pos$x < 10) pos$x <- pos$x + 1 })
+  
+  output$maze <- renderPlot({
+    image(1:10, 1:10, t(maze), col = c("white", "black"), xlab = "", ylab = "", axes = FALSE)
+    points(pos$x, pos$y, pch = 19, col = "red", cex = 2)
+  })
+}
+
+shinyApp(ui, server)
